@@ -6,8 +6,6 @@ import WalletHeader from "@/components/WalletHeader";
 import BottomNav from "@/components/BottomNav";
 import CreateWallet from "@/components/CreateWallet";
 import { DeWalletABI } from "@/contracts/DeWalletABI";
-import { Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const CONTRACT_ADDRESS = "0x608b7f1ef01600C33e34C585a85fAE8ECAfEC6D2";
 const ALCHEMY_API_KEY = "cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8";
@@ -79,20 +77,11 @@ const Index = () => {
         <WalletHeader />
         
         {/* Wallet Address Section */}
-        <div className="mt-4 mb-6 bg-gray-900 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-400">Wallet Address</div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-indigo-400 hover:text-indigo-300"
-              onClick={copyAddress}
-            >
-              <Copy className="w-4 h-4 mr-1" />
-              Copy
-            </Button>
-          </div>
-          <div className="text-sm font-mono mt-1 break-all">
+        <div 
+          onClick={copyAddress}
+          className="mt-4 mb-6 bg-gray-900 rounded-lg p-4 cursor-pointer hover:bg-gray-800 transition-colors"
+        >
+          <div className="text-sm font-mono break-all text-gray-300 hover:text-white">
             {localStorage.getItem("walletAddress")}
           </div>
         </div>
