@@ -15,7 +15,7 @@ const Send = () => {
   const handleSend = async () => {
     try {
       setIsLoading(true);
-      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY");
+      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8");
       const signer = new ethers.Wallet(localStorage.getItem("privateKey") || "", provider);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
 

@@ -6,7 +6,7 @@ const WalletHeader = () => {
   return (
     <div className="flex items-center justify-between">
       <Avatar className="h-8 w-8">
-        <AvatarImage src="/placeholder.svg" />
+        <AvatarImage src="/lovable-uploads/fcae4b49-2dcf-481d-b0d4-4df268c4d28f.png" />
         <AvatarFallback>DW</AvatarFallback>
       </Avatar>
       

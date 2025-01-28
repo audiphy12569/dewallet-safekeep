@@ -13,7 +13,7 @@ const TokenList = ({ tokens }: TokenListProps) => {
   const { data: ethBalance } = useQuery({
     queryKey: ['ethBalance'],
     queryFn: async () => {
-      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY");
+      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8");
       const walletAddress = localStorage.getItem("walletAddress");
       if (!walletAddress) return "0";
       const balance = await provider.getBalance(walletAddress);
@@ -28,7 +28,7 @@ const TokenList = ({ tokens }: TokenListProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="/tokens/ethereum.png" alt="ETH" />
+              <AvatarImage src="/lovable-uploads/fcae4b49-2dcf-481d-b0d4-4df268c4d28f.png" alt="ETH" />
               <AvatarFallback>ETH</AvatarFallback>
             </Avatar>
             <div>
@@ -40,7 +40,7 @@ const TokenList = ({ tokens }: TokenListProps) => {
       </Card>
 
       {/* Other ERC20 Tokens */}
-      {tokens.map((token) => (
+      {tokens.filter(token => token.symbol !== "ETH").map((token) => (
         <Card key={token.symbol} className="p-4 bg-gray-900 border-gray-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -52,10 +52,6 @@ const TokenList = ({ tokens }: TokenListProps) => {
                 <h3 className="font-medium">{token.name}</h3>
                 <p className="text-sm text-gray-400">{token.balance} {token.symbol}</p>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">{token.price}</p>
-              <p className="text-sm text-green-500">{token.change}</p>
             </div>
           </div>
         </Card>
