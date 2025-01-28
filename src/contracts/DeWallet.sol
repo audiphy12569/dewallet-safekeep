@@ -63,10 +63,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit WalletCreated(msg.sender, block.timestamp);
     }
 
-    /**
-     * @dev Transfers ETH to another address
-     * @param _to Recipient address
-     */
     function transferETH(address _to) external payable onlyActiveWallet validAddress(_to) nonReentrant {
         require(msg.value > 0, "Amount must be greater than 0");
         require(address(this).balance >= msg.value, "Insufficient balance");
@@ -78,12 +74,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit EthTransferred(msg.sender, _to, msg.value);
     }
 
-    /**
-     * @dev Transfers ERC-20 tokens
-     * @param _token Token contract address
-     * @param _to Recipient address
-     * @param _amount Amount of tokens to transfer
-     */
     function transferToken(
         address _token,
         address _to,
@@ -100,10 +90,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit TokenTransferred(_token, msg.sender, _to, _amount);
     }
 
-    /**
-     * @dev Updates wallet seed phrase
-     * @param _newSeedPhraseHash New seed phrase hash
-     */
     function updateSeedPhrase(bytes32 _newSeedPhraseHash) external onlyActiveWallet {
         require(_newSeedPhraseHash != bytes32(0), "Invalid seed phrase hash");
         wallets[msg.sender].seedPhraseHash = _newSeedPhraseHash;
@@ -112,10 +98,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit SeedPhraseUpdated(msg.sender, block.timestamp);
     }
 
-    /**
-     * @dev Initiates wallet recovery process
-     * @param _seedPhraseHash Hash of the seed phrase for verification
-     */
     function initiateRecovery(bytes32 _seedPhraseHash) external {
         Wallet storage wallet = wallets[msg.sender];
         require(wallet.owner != address(0), "Wallet does not exist");
@@ -132,8 +114,8 @@ contract DeWallet is ReentrancyGuard, Ownable {
         require(oldWallet.owner != address(0), "Old wallet does not exist");
         
         bytes32 messageHash = keccak256(abi.encodePacked(_oldWallet, msg.sender, block.timestamp));
-        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
-        address signer = ECDSA.recover(signedHash, _signature);
+        bytes32 signedHash = messageHash.toEthSignedMessageHash();
+        address signer = signedHash.recover(_signature);
         require(signer == _oldWallet, "Invalid signature");
 
         // Transfer ownership
@@ -160,18 +142,11 @@ contract DeWallet is ReentrancyGuard, Ownable {
         );
     }
 
-    /**
-     * @dev Estimates gas fee for ETH transfer
-     * @param _to Recipient address
-     * @param _value Amount to transfer
-     */
     function estimateGasFee(address _to, uint256 _value) external view returns (uint256) {
         return gasleft();
     }
 
-    // Receive function to accept ETH
     receive() external payable {}
 
-    // Fallback function
     fallback() external payable {}
 }
