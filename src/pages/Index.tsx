@@ -77,12 +77,14 @@ const Index = () => {
         <WalletHeader />
         
         {/* Wallet Address Section */}
-        <div 
-          onClick={copyAddress}
-          className="mt-2 mb-4 bg-gray-900 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-800 transition-colors"
-        >
-          <div className="text-sm font-mono break-all text-gray-300 hover:text-white">
-            {localStorage.getItem("walletAddress")}
+        <div className="flex justify-center">
+          <div 
+            onClick={copyAddress}
+            className="mt-2 mb-4 bg-gray-900 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-800 transition-colors max-w-[280px]"
+          >
+            <div className="text-sm font-mono break-all text-gray-300 hover:text-white text-center">
+              {localStorage.getItem("walletAddress")}
+            </div>
           </div>
         </div>
         
