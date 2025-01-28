@@ -11,20 +11,26 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
 
   const generateWallet = async () => {
     try {
+      // Generate a random mnemonic (seed phrase)
       const wallet = ethers.Wallet.createRandom();
-      setSeedPhrase(wallet.mnemonic?.phrase || "");
       
-      // Hash the seed phrase for the smart contract
-      const seedPhraseHash = ethers.keccak256(ethers.toUtf8Bytes(wallet.mnemonic?.phrase || ""));
+      if (!wallet.mnemonic?.phrase) {
+        throw new Error("Failed to generate seed phrase");
+      }
+
+      setSeedPhrase(wallet.mnemonic.phrase);
       
       // Store wallet info securely
       localStorage.setItem("walletAddress", wallet.address);
-      // Note: In a production environment, we'd want to encrypt this
-      localStorage.setItem("seedPhrase", wallet.mnemonic?.phrase || "");
+      localStorage.setItem("seedPhrase", wallet.mnemonic.phrase);
+      
+      // Hash the seed phrase for the smart contract
+      const seedPhraseHash = ethers.keccak256(ethers.toUtf8Bytes(wallet.mnemonic.phrase));
+      console.log("Wallet created with address:", wallet.address);
       
       toast({
         title: "Wallet Created Successfully",
-        description: "Please save your seed phrase securely.",
+        description: "Please save your seed phrase securely. You'll need it to recover your wallet.",
       });
       
       onWalletCreated();
@@ -32,7 +38,7 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
       console.error("Error creating wallet:", error);
       toast({
         title: "Error",
-        description: "Failed to create wallet",
+        description: "Failed to create wallet. Please try again.",
         variant: "destructive",
       });
     }
@@ -42,7 +48,7 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
     navigator.clipboard.writeText(seedPhrase);
     toast({
       title: "Copied",
-      description: "Seed phrase copied to clipboard",
+      description: "Seed phrase copied to clipboard. Store it safely!",
     });
   };
 
@@ -54,6 +60,10 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+    toast({
+      title: "Downloaded",
+      description: "Seed phrase downloaded. Keep it in a secure location.",
+    });
   };
 
   return (
@@ -75,7 +85,7 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
         ) : (
           <div className="space-y-4">
             <div className="p-4 bg-gray-800 rounded-lg">
-              <p className="text-sm break-all">{seedPhrase}</p>
+              <p className="text-sm break-all font-mono">{seedPhrase}</p>
             </div>
             
             <div className="flex gap-2">
@@ -95,6 +105,10 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
                 Download
               </Button>
             </div>
+
+            <p className="text-sm text-yellow-500 mt-4">
+              ⚠️ Warning: Never share your seed phrase with anyone. Store it securely offline.
+            </p>
           </div>
         )}
       </Card>
