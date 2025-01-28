@@ -6,10 +6,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-/**
- * @title DeWallet
- * @dev A secure wallet contract for managing ETH and ERC-20 tokens
- */
 contract DeWallet is ReentrancyGuard, Ownable {
     using ECDSA for bytes32;
 
@@ -128,11 +124,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit WalletRecoveryInitiated(msg.sender, block.timestamp);
     }
 
-    /**
-     * @dev Completes wallet recovery process
-     * @param _oldWallet Address of the old wallet
-     * @param _signature Signed message proving ownership
-     */
     function completeRecovery(
         address _oldWallet,
         bytes memory _signature
@@ -141,8 +132,8 @@ contract DeWallet is ReentrancyGuard, Ownable {
         require(oldWallet.owner != address(0), "Old wallet does not exist");
         
         bytes32 messageHash = keccak256(abi.encodePacked(_oldWallet, msg.sender, block.timestamp));
-        bytes32 signedHash = messageHash.toEthSignedMessageHash();
-        address signer = signedHash.recover(_signature);
+        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
+        address signer = ECDSA.recover(signedHash, _signature);
         require(signer == _oldWallet, "Invalid signature");
 
         // Transfer ownership
