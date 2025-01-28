@@ -20,7 +20,7 @@ contract DeWallet is ReentrancyGuard, Ownable {
 
     // State variables
     mapping(address => Wallet) public wallets;
-    mapping(address => mapping(address => uint256)) public tokenBalances; // user => token => balance
+    mapping(address => mapping(address => uint256)) public tokenBalances;
     uint256 public totalWallets;
     uint256 public constant RECOVERY_DELAY = 24 hours;
 
@@ -114,8 +114,8 @@ contract DeWallet is ReentrancyGuard, Ownable {
         require(oldWallet.owner != address(0), "Old wallet does not exist");
         
         bytes32 messageHash = keccak256(abi.encodePacked(_oldWallet, msg.sender, block.timestamp));
-        bytes32 signedHash = messageHash.toEthSignedMessageHash();
-        address signer = signedHash.recover(_signature);
+        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
+        address signer = ECDSA.recover(signedHash, _signature);
         require(signer == _oldWallet, "Invalid signature");
 
         // Transfer ownership
