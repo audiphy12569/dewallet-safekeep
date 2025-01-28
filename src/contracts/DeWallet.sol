@@ -4,11 +4,9 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 contract DeWallet is ReentrancyGuard, Ownable {
-    using ECDSA for bytes32;
-
     // Structs
     struct Wallet {
         address owner;
@@ -114,9 +112,15 @@ contract DeWallet is ReentrancyGuard, Ownable {
         require(oldWallet.owner != address(0), "Old wallet does not exist");
         
         bytes32 messageHash = keccak256(abi.encodePacked(_oldWallet, msg.sender, block.timestamp));
-        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
-        address signer = ECDSA.recover(signedHash, _signature);
-        require(signer == _oldWallet, "Invalid signature");
+        
+        require(
+            SignatureChecker.isValidSignatureNow(
+                _oldWallet,
+                messageHash,
+                _signature
+            ),
+            "Invalid signature"
+        );
 
         // Transfer ownership
         wallets[msg.sender] = oldWallet;
