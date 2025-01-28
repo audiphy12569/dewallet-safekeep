@@ -36,7 +36,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
     event WalletRecovered(address indexed oldWallet, address indexed newWallet, uint256 timestamp);
     event SeedPhraseUpdated(address indexed wallet, uint256 timestamp);
 
-    // Modifiers
     modifier onlyActiveWallet() {
         require(wallets[msg.sender].isActive, "Wallet is not active");
         _;
@@ -48,15 +47,8 @@ contract DeWallet is ReentrancyGuard, Ownable {
         _;
     }
 
-    /**
-     * @dev Constructor
-     */
     constructor() Ownable(msg.sender) {}
 
-    /**
-     * @dev Creates a new wallet
-     * @param _seedPhraseHash Hash of the encrypted seed phrase
-     */
     function createWallet(bytes32 _seedPhraseHash) external {
         require(wallets[msg.sender].owner == address(0), "Wallet already exists");
         require(_seedPhraseHash != bytes32(0), "Invalid seed phrase hash");
@@ -149,8 +141,8 @@ contract DeWallet is ReentrancyGuard, Ownable {
         require(oldWallet.owner != address(0), "Old wallet does not exist");
         
         bytes32 messageHash = keccak256(abi.encodePacked(_oldWallet, msg.sender, block.timestamp));
-        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
-        address signer = ECDSA.recover(signedHash, _signature);
+        bytes32 signedHash = messageHash.toEthSignedMessageHash();
+        address signer = signedHash.recover(_signature);
         require(signer == _oldWallet, "Invalid signature");
 
         // Transfer ownership
@@ -162,10 +154,6 @@ contract DeWallet is ReentrancyGuard, Ownable {
         emit WalletRecovered(_oldWallet, msg.sender, block.timestamp);
     }
 
-    /**
-     * @dev Returns wallet details
-     * @param _wallet Wallet address
-     */
     function getWalletDetails(address _wallet) external view returns (
         address owner,
         bool isActive,
