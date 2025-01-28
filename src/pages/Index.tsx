@@ -8,6 +8,7 @@ import CreateWallet from "@/components/CreateWallet";
 import { DeWalletABI } from "@/contracts/DeWalletABI";
 
 const CONTRACT_ADDRESS = "0x608b7f1ef01600C33e34C585a85fAE8ECAfEC6D2";
+const ALCHEMY_API_KEY = "cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8";
 
 const Index = () => {
   const [hasWallet, setHasWallet] = useState(false);
@@ -22,9 +23,8 @@ const Index = () => {
       balance: balance,
       price: "$0",
       change: "+$0",
-      icon: "/tokens/ethereum.png"
+      icon: "/lovable-uploads/fcae4b49-2dcf-481d-b0d4-4df268c4d28f.png"
     },
-    // Add other tokens as needed
   ];
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const Index = () => {
 
   const fetchBalance = async (address: string) => {
     try {
-      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY");
+      const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
       const balance = await provider.getBalance(address);
       setBalance(ethers.formatEther(balance));
     } catch (error) {
@@ -49,10 +49,10 @@ const Index = () => {
   };
 
   const handleWalletCreated = () => {
-    setHasWallet(true);
     const walletAddress = localStorage.getItem("walletAddress");
     if (walletAddress) {
       fetchBalance(walletAddress);
+      setHasWallet(true);
     }
   };
 
