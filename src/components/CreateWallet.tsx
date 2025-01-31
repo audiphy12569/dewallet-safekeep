@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { Key, Copy, Download, CheckCircle } from "lucide-react";
+import { DeWalletABI, CONTRACT_ADDRESS } from "@/contracts/DeWalletABI";
 
 const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
   const [seedPhrase, setSeedPhrase] = useState("");
@@ -22,13 +23,24 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
       setSeedPhrase(wallet.mnemonic.phrase);
       setWalletAddress(wallet.address);
       
+      // Encrypt private key before storing
+      const encryptedKey = await wallet.encrypt(wallet.mnemonic.phrase);
+      
       // Store wallet info securely
       localStorage.setItem("walletAddress", wallet.address);
-      localStorage.setItem("seedPhrase", wallet.mnemonic.phrase);
-      localStorage.setItem("privateKey", wallet.privateKey);
+      localStorage.setItem("encryptedPrivateKey", encryptedKey);
       
       // Hash the seed phrase for the smart contract
       const seedPhraseHash = ethers.keccak256(ethers.toUtf8Bytes(wallet.mnemonic.phrase));
+      
+      // Create wallet in smart contract
+      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8");
+      const signer = new ethers.Wallet(wallet.privateKey, provider);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
+      
+      const tx = await contract.createWallet(seedPhraseHash);
+      await tx.wait();
+      
       console.log("Wallet created with address:", wallet.address);
       
       toast({

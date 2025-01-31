@@ -45,8 +45,10 @@ const Send = () => {
       return;
     }
 
-    const privateKey = localStorage.getItem("privateKey");
-    if (!privateKey) {
+    const encryptedKey = localStorage.getItem("encryptedPrivateKey");
+    const seedPhrase = localStorage.getItem("seedPhrase");
+    
+    if (!encryptedKey || !seedPhrase) {
       toast({
         title: "Error",
         description: "No wallet found. Please create a wallet first.",
@@ -57,15 +59,18 @@ const Send = () => {
 
     try {
       setIsLoading(true);
+      
+      // Decrypt the private key using the seed phrase
+      const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, seedPhrase);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
-      const signer = new ethers.Wallet(privateKey, provider);
+      const signer = wallet.connect(provider);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
 
       let tx;
       if (selectedToken === "ETH") {
         tx = await contract.transferETH(to, { value: ethers.parseEther(amount) });
       } else {
-        // For ERC20 tokens (to be implemented when tokens are available)
+        // For ERC20 tokens (to be implemented)
         // tx = await contract.transferToken(tokenAddress, to, ethers.parseEther(amount));
       }
 
@@ -83,7 +88,7 @@ const Send = () => {
       console.error("Error sending transaction:", error);
       toast({
         title: "Error",
-        description: "Failed to send transaction. Please check your balance and try again.",
+        description: error instanceof Error ? error.message : "Failed to send transaction. Please try again.",
         variant: "destructive",
       });
     } finally {
