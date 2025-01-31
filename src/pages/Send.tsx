@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Token } from "@/types/wallet";
 import { useQuery } from "@tanstack/react-query";
 
 const ALCHEMY_API_KEY = "cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8";
@@ -46,10 +45,20 @@ const Send = () => {
       return;
     }
 
+    const privateKey = localStorage.getItem("privateKey");
+    if (!privateKey) {
+      toast({
+        title: "Error",
+        description: "No wallet found. Please create a wallet first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
-      const signer = new ethers.Wallet(localStorage.getItem("privateKey") || "", provider);
+      const signer = new ethers.Wallet(privateKey, provider);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
 
       let tx;
