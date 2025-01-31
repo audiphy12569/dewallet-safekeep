@@ -46,9 +46,9 @@ const Send = () => {
     }
 
     const encryptedKey = localStorage.getItem("encryptedPrivateKey");
-    const seedPhrase = localStorage.getItem("seedPhrase");
+    const walletAddress = localStorage.getItem("walletAddress");
     
-    if (!encryptedKey || !seedPhrase) {
+    if (!encryptedKey || !walletAddress) {
       toast({
         title: "Error",
         description: "No wallet found. Please create a wallet first.",
@@ -60,8 +60,8 @@ const Send = () => {
     try {
       setIsLoading(true);
       
-      // Decrypt the private key using the seed phrase
-      const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, seedPhrase);
+      // Get the wallet instance using the encrypted key
+      const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, walletAddress);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
       const signer = wallet.connect(provider);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
