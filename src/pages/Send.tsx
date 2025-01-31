@@ -46,9 +46,9 @@ const Send = () => {
     }
 
     const encryptedKey = localStorage.getItem("encryptedPrivateKey");
-    const walletAddress = localStorage.getItem("walletAddress");
+    const seedPhrase = localStorage.getItem("seedPhrase");
     
-    if (!encryptedKey || !walletAddress) {
+    if (!encryptedKey || !seedPhrase) {
       toast({
         title: "Error",
         description: "No wallet found. Please create a wallet first.",
@@ -60,8 +60,8 @@ const Send = () => {
     try {
       setIsLoading(true);
       
-      // Get the wallet instance using the encrypted key
-      const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, walletAddress);
+      // Decrypt the private key using the seed phrase
+      const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, seedPhrase);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
       const signer = wallet.connect(provider);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
@@ -113,7 +113,6 @@ const Send = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ETH">Sepolia ETH ({ethBalance || "0"} ETH)</SelectItem>
-                {/* Add more tokens here when available */}
               </SelectContent>
             </Select>
           </div>

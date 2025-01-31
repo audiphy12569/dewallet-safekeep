@@ -23,12 +23,13 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
       setSeedPhrase(wallet.mnemonic.phrase);
       setWalletAddress(wallet.address);
       
-      // Encrypt private key before storing
+      // Store wallet info securely - encrypt with seed phrase
       const encryptedKey = await wallet.encrypt(wallet.mnemonic.phrase);
       
-      // Store wallet info securely
+      // Store wallet info
       localStorage.setItem("walletAddress", wallet.address);
       localStorage.setItem("encryptedPrivateKey", encryptedKey);
+      localStorage.setItem("seedPhrase", wallet.mnemonic.phrase); // Store for decryption
       
       // Hash the seed phrase for the smart contract
       const seedPhraseHash = ethers.keccak256(ethers.toUtf8Bytes(wallet.mnemonic.phrase));
