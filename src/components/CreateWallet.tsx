@@ -23,22 +23,23 @@ const CreateWallet = ({ onWalletCreated }: { onWalletCreated: () => void }) => {
       setSeedPhrase(wallet.mnemonic.phrase);
       setWalletAddress(wallet.address);
       
-      // Store wallet info securely - encrypt with seed phrase
+      // Encrypt private key with seed phrase
       const encryptedKey = await wallet.encrypt(wallet.mnemonic.phrase);
       
-      // Store wallet info
+      // Store wallet info securely
       localStorage.setItem("walletAddress", wallet.address);
       localStorage.setItem("encryptedPrivateKey", encryptedKey);
-      localStorage.setItem("seedPhrase", wallet.mnemonic.phrase); // Store for decryption
+      localStorage.setItem("seedPhrase", wallet.mnemonic.phrase);
+      
+      // Create wallet in smart contract
+      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8");
+      const signer = wallet.connect(provider);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
       
       // Hash the seed phrase for the smart contract
       const seedPhraseHash = ethers.keccak256(ethers.toUtf8Bytes(wallet.mnemonic.phrase));
       
-      // Create wallet in smart contract
-      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cUnkmV9JNeKd-cc5uviKiJIsy6BmtSY8");
-      const signer = new ethers.Wallet(wallet.privateKey, provider);
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, DeWalletABI, signer);
-      
+      // Create wallet in smart contract and wait for confirmation
       const tx = await contract.createWallet(seedPhraseHash);
       await tx.wait();
       

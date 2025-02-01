@@ -60,7 +60,7 @@ const Send = () => {
     try {
       setIsLoading(true);
       
-      // Decrypt the private key using the seed phrase
+      // Decrypt the wallet using the seed phrase
       const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, seedPhrase);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
       const signer = wallet.connect(provider);
@@ -69,9 +69,6 @@ const Send = () => {
       let tx;
       if (selectedToken === "ETH") {
         tx = await contract.transferETH(to, { value: ethers.parseEther(amount) });
-      } else {
-        // For ERC20 tokens (to be implemented)
-        // tx = await contract.transferToken(tokenAddress, to, ethers.parseEther(amount));
       }
 
       await tx.wait();
@@ -88,7 +85,7 @@ const Send = () => {
       console.error("Error sending transaction:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send transaction. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to send transaction",
         variant: "destructive",
       });
     } finally {
