@@ -33,7 +33,6 @@ const Index = () => {
       const encryptedPrivateKey = localStorage.getItem("encryptedPrivateKey");
       const seedPhrase = localStorage.getItem("seedPhrase");
       
-      // Only set hasWallet to true if all required wallet data exists
       const hasAllWalletData = !!(walletAddress && encryptedPrivateKey && seedPhrase);
       setHasWallet(hasAllWalletData);
       
@@ -73,18 +72,15 @@ const Index = () => {
     }
   };
 
-  // If no wallet exists, show the CreateWallet component
   if (!hasWallet) {
     return <CreateWallet onWalletCreated={handleWalletCreated} />;
   }
 
-  // If wallet exists, show the wallet interface
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container max-w-md mx-auto px-4 py-6">
         <WalletHeader />
         
-        {/* Wallet Address Section */}
         <div className="flex justify-center">
           <div 
             onClick={copyAddress}
@@ -96,7 +92,6 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Balance Section */}
         <div className="mt-8 text-center">
           <h1 className="text-4xl font-bold">${balance}</h1>
           <p className="text-green-500 mt-1">
@@ -104,10 +99,7 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Token List */}
         <TokenList tokens={tokens} />
-
-        {/* Bottom Navigation */}
         <BottomNav />
       </div>
     </div>

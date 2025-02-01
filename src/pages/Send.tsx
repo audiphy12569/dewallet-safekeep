@@ -23,7 +23,6 @@ const Send = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Fetch ETH balance
   const { data: ethBalance } = useQuery({
     queryKey: ['ethBalance'],
     queryFn: async () => {
@@ -60,7 +59,6 @@ const Send = () => {
     try {
       setIsLoading(true);
       
-      // Decrypt the wallet using the seed phrase
       const wallet = await ethers.Wallet.fromEncryptedJson(encryptedKey, seedPhrase);
       const provider = new ethers.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`);
       const signer = wallet.connect(provider);
@@ -78,7 +76,6 @@ const Send = () => {
         description: "Transaction sent successfully",
       });
 
-      // Clear form
       setTo("");
       setAmount("");
     } catch (error) {
